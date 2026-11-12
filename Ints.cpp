@@ -67,8 +67,10 @@ Ints Ints::operator+(const Ints & rhs)
     throw std::logic_error("Ints::+: diff sizes");
   }
   Ints res(rhs);
+  long long sum = 0;
   for (size_t i = 0; i < volume; i++) {
-    if (res.data[i] > INT_MAX - data[i] || res.data[i] < INT_MIN + data[i]) {
+  sum = (long long)(data[i]) + rhs.data[i];
+    if (sum > INT_MAX || sum < INT_MIN) {
       throw std::logic_error("Ints::+: Overflow");
     }
     res.data[i] += data[i];
@@ -122,10 +124,10 @@ void Ints::resize(size_t len)
 {
   size_t new_size = 0;
   if (!len) {
-    if (volume > ULONG_MAX / 2) {
+    if (volume > (ULONG_MAX - size == 0) / 2) {
       throw std::logic_error("Ints::resize: Overflow");
     }
-    new_size = volume * 2;
+    new_size = volume * 2 + size == 0;
   } else {
     if (volume > ULONG_MAX - len) {
       throw std::logic_error("Ints::resize: Overflow");
@@ -147,20 +149,23 @@ Ints Ints::insert(int i, bool (*func)(int, int))
   int temp = 0;
   int buff = 0;
   size_t j = 0;
-  for (; j < volume; j++) {
+  for (; j < res.getVolume(); j++) {
     if (func(res.data[j], i)) {
       temp = res.data[j];
       res.data[j] = i;
       break;
     }
   }
-  if (j == volume) {
+  if (j == res.getVolume()) {
     res.append(i);
   } else {
     j++;
-    volume++;
+    if (res.getVolume() == res.getSize()) {
+      res.resize();
+    }
+    res.volume++;
   }
-  for (; j < volume; j++) {
+  for (; j < res.getVolume(); j++) {
     buff = res.data[j];
     res.data[j] = temp;
     temp = buff;
@@ -237,12 +242,13 @@ Ints Ints::append(const Ints& b)
       res.resize(b.volume-volume);
     } else {
       res.resize(volume - b.volume);
+    }
   }
   for (size_t i = 0; i < b.volume; i++) {
     res.data[res.volume + i] = b.data[i];
   }
   std::swap(res.data, data);
-  std::swap(res.volume, volume);
+  std::swap(res.volume + b.volume, volume);
   std::swap(res.size, size);
   return *this;
 }
@@ -264,7 +270,7 @@ Ints Ints::appendSort(const Ints& b)
     res.appendSort(b.data[i]);
   }
   std::swap(res.data, data);
-  std::swap(res.volume + b.volume, volume);
+  std::swap(res.volume, volume);
   std::swap(res.size, size);
   return *this;
 }

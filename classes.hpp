@@ -67,9 +67,10 @@ class Plot
 {
 private:
   Points data;
+  bool isDiffState(p_t pl, p_t pr, int y);
 public:
   Plot();
-  Plot(size_t size, p_t point) = default;
+  Plot(size_t size, p_t point);
   Plot(const Plot & rhs) = default;
   Plot & operator=(const Plot & rhs) = default;
   Plot & operator=(Plot && rhs) noexcept = default;

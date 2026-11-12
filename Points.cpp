@@ -48,9 +48,7 @@ Points Points::append(p_t point)
   Points res(*this);
   res.datax.append(point.x);
   res.datay.append(point.y);
-  std::swap(res.datax, datax);
-  std::swap(res.datay, datay);
-  return *this;
+  return res;
 }
 
 Points Points::appendSort(p_t point)
@@ -58,7 +56,5 @@ Points Points::appendSort(p_t point)
   Points res(*this);
   res.datax.appendSort(point.x);
   res.datay.insert(point.y, res.datax, point.x, [] (int a, int b) {return a == b});
-  std::swap(res.datax, datax);
-  std::swap(res.datay, datay);
-  return *this; 
+  return res; 
 }

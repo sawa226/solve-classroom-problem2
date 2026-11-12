@@ -4,6 +4,10 @@ Plot::Plot():
   data()
 {}
 
+Plot::Plot(size_t size, p_t point)
+  data(size, point)
+{};
+
 void Plot::set(int x, int y)
 {
   p_t point = {x, y};
@@ -19,13 +23,20 @@ int Plot::calc(int x) const
     throw std::out_of_range("Plot::calc: out of range");
   }
   size_t id_x1 = data.findSortY(x);
-  if (id_x1 == data.getVolume() || p1.x == x) {
+  p_t p1 = data.get(id_x1);
+  if (p1.x == x) {
     return p1.y;
   }
-  p_t p1 = data.get(id_x1);
-  size_t id_x2 = id_x1 + 1;
-  p_t p2 = data.get(id_x2);
+  p_t p2 = data.get(id_x1 - 1);
   return (int)std::round((p2.y - p1.y) * 1.0 * (x - p1.x) / (p2.x - p1.x) + p1.y);
+}
+
+bool Plot::isDiffState(p_t pl, p_t pr, int y)
+{
+  if (pl.y <= y && pr.y > y || pl.y > y && pr.y <= y) {
+    return true;
+  }
+  return false;
 }
 
 size_t Plot::solve(int y, Ints& buff) const
