@@ -3,7 +3,7 @@
 class Ints
 {
 private:
-  int * resize(int * data);
+  void resize(size_t len = 0);
   size_t volume;
   size_t size;
   int * data;
