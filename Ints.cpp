@@ -95,6 +95,32 @@ void Ints::getSave(size_t id)
   return data[id];
 }
 
+size_t Ints::find(int i) const
+{
+  for (size_t j = 0; j < volume; j++) {
+    if (data[j] == i) {
+      return j;
+    }
+  }
+  return volume;
+}
+
+size_t Ints::findSort(int j) const
+{
+  size_t l = 0;
+  size_t r = volume;
+  size_t m = (l + r) / 2;
+  while (r > l) {
+    if (data[m] > j) {
+      r = m;
+    } else {
+      l = m;
+    }
+    m = (l + r) / 2;
+  }
+  return data[l];
+}
+
 void Ints::resize(size_t len)
 {
   size_t new_volume = 0;
@@ -118,6 +144,54 @@ void Ints::resize(size_t len)
   delete[] res;
 }
 
+Ints Ints::insert(int i, bool (*func)(int, int))
+{
+  Ints res(*this);
+  int temp = 0;
+  int buff = 0;
+  size_t j = 0;
+  for (; j < volume; j++) {
+    if (func(res.data[i], i)) {
+      temp = res.data[j];
+      res.data[j] = i;
+      break;
+    }
+  }
+  for (; j < volume; j++) {
+    buff = res.data[i];
+    res.data[j] = temp;
+    temp = buff;
+  }
+  std::swap(res.data, data);
+  std::swap(res.volume, volume);
+  std::swap(res.size, size);
+  return *this; 
+}
+
+Ints Ints::insert(int i, Ints mas, int k, bool (*func)(int, int))
+{
+  Ints res(*this);
+  int temp = 0;
+  int buff = 0;
+  size_t j = 0;
+  for (; j < volume; j++) {
+    if (func(mas.data[i], k)) {
+      temp = res.data[j];
+      res.data[j] = i;
+      break;
+    }
+  }
+  j++;
+  for (; j < volume; j++) {
+    buff = res.data[i];
+    res.data[j] = temp;
+    temp = buff;
+  }
+  std::swap(res.data, data);
+  std::swap(res.volume, volume);
+  std::swap(res.size, size);
+  return *this; 
+}
 Ints Ints::append(int i)
 {
   Ints res(*this);
@@ -125,6 +199,19 @@ Ints Ints::append(int i)
     res.resize();
   }
   res.data[res.volume++] = i;
+  std::swap(res.data, data);
+  std::swap(res.volume, volume);
+  std::swap(res.size, size);
+  return *this;
+}
+
+Ints Ints::appendSort(int i, bool (*func)(int, int))
+{
+  Ints res(*this);
+  if (volume == size) {
+    res.resize();
+  }
+  res = res.insert(i, func);
   std::swap(res.data, data);
   std::swap(res.volume, volume);
   std::swap(res.size, size);
@@ -142,6 +229,24 @@ Ints Ints::append(Ints b)
   }
   for (size_t i = 0; i < b.volume; i++) {
     res.data[i] = b.data[i];
+  }
+  std::swap(res.data, data);
+  std::swap(res.volume, volume);
+  std::swap(res.size, size);
+  return *this;
+}
+
+Ints Ints::appendSort(Ints b)
+{
+  Ints res(*this);
+  if (volume > ULONG_MAX - b.volume) {
+    throw std::logic_error("Ints::append: Overflow");
+  }
+  if (volume + b.volume >= size) {
+    res.resize(b.volume-volume);
+  }
+  for (size_t i = 0; i < b.volume; i++) {
+    res.data.appendSort(b.data[i]);
   }
   std::swap(res.data, data);
   std::swap(res.volume, volume);

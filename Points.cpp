@@ -1,49 +1,64 @@
 #include "classes.hpp"
 
 Points::Points():
-  data()
+  datax(),
+  datay()
 {}
 
 Points::Points(size_t size, p_t point):
-  data(size*2, point.x)
-{
-  for (size_t i = 1; i < size; i+=2) {
-    data.set(i, point.y);
-}
+  datax(size, point.x),
+  datay(size, point.y)
+{}
 
 void Points::set(size_t id, p_t point) noexcept
 {
-  id *= 2;
-  data.set(id++, point.x);
-  data.set(id, point.y);
+  datax.set(id, point.x);
+  datay.set(id, point.y);
 }
 
 void Points::setSave(size_t id, p_t point)
 {
-  if (id > ULONG_MAX / 2 - 1) {
-    throw std::logic_error("Points::setSave: Overflow");
-  }
   if (id < 0 || id > data.volume) {
     throw std::out_of_range("Points::setSave: out of range");
   }
-  id *= 2;
-  data.set(id++, point.x);
-  data.set(id, point.y);
+  datax.set(id, point.x);
+  datay.set(id, point.y);
 }
 
-int Points::getSave(size_t id)
+p_t Points::get(size_t id)
 {
-  if (id > ULONG_MAX / 2 - 1) {
-    throw std::logic_error("Points::setSave: Overflow");
+  return {datax.get(id), datay.get(id)}
+}
+
+p_t Points::getSave(size_t id)
+{
+  if (id < 0 || id > datax.volume) {
+    throw std::out_of_range("Points::getSave: out of range");
   }
-  if (id < 0 || id > data.volume) {
-    throw std::out_of_range("Points::setSave: out of range");
-  }
-  return data.get(id);
+  return {datax.get(id), datay.get(id)};
+}
+
+size_t findSortX(int y)
+{
+  return datay.findSort();
 }
 
 Points Points::append(p_t point)
 {
-  data.append(point.x);
-  data.append(point.y);
+  Points res(*this);
+  res.datax.append(point.x);
+  res.datay.append(point.y);
+  std::swap(res.datax, datax);
+  std::swap(res.datay, datay);
+  return *this;
+}
+
+Points Points::appendSort(p_t point)
+{
+  Points res(*this);
+  res.datax.appendSort(point.x);
+  res.datay.insert(point.y, res.datax, k, [] (int a, int b) {return a == b});
+  std::swap(res.datax, datax);
+  std::swap(res.datay, datay);
+  return *this; 
 }

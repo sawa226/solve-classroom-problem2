@@ -22,8 +22,12 @@ public:
   void setSave(size_t id, int i);
   int get(size_t id) const noexcept {return data[id];};
   int getSave(size_t id) const;
+  size_t find(int i) const;
+  size_t findSort(int i) const;
   Ints append(int i);
+  Ints appendSort(int i);
   Ints append(Ints b);
+  Ints appendSort(int i);
 };
 
 class p_t
@@ -35,35 +39,41 @@ class p_t
 class Points
 {
 private:
-  Ints data;
+  Ints datax;
+  Ints datay;
 public:
   Points();
   Points(size_t size, p_t point);
+  ~Points() = default;
   Points(const Points & rhs) = default;
   Points & operator=(const Points & rhs) = default;
   Points & operator=(const Points && rhs) noexcept = default;
 
+  size_t getVolume() {return datax.getVolume();};
   void set(size_t id, p_t point) noexcept;
   void setSave(size_t id, p_t point);
-  int get(size_t id) const noexcept {return data[id];};
-  int getSave(size_t id);
+  p_t get(size_t id) const noexcept;
+  p_t getSave(size_t id);
+  size_t findSortX(int y) const;
+  size_t findSortY(int x) const;
   Points append(p_t point);
+  Point appendSort(p_t point);
 };
 
 class Plot
 {
 private:
-  Ints data;
+  Points data;
 public:
   Plot();
-  Plot(size_t size, p_t point);
+  Plot(size_t size, p_t point) = default;
   Plot(const Plot & rhs) = default;
   Plot & operator=(const Plot & rhs) = default;
   Plot & operator=(Plot && rhs) noexcept = default;
 
   void set(int x, int y);
   int calc(int x) const;
-  void solve(int x, Ints& buff) const;
+  void solve(int y, Ints& buff) const;
   Points append(p_t point);
 };
 
@@ -80,8 +90,10 @@ public:
   Mtx & operator=(const Mtx & rhs) = default;
   Mtx & operator=(Mtx && rhs) noexcept = default;
 
-  Mtx sum(Mtx b);
-  Mtx mul(Mtx b);
+  size_t getVolume() const {return n * m};
+  Mtx sum(const Mtx& b);
+  Mtx mul(int b);
+  Mtx mul(const Mtx& b);
   Mtx transpose() const;
   int det() const;
   Mtx add_row(int init);
@@ -107,10 +119,4 @@ public:
   Mtx3d & operator+(const Mtx3d & rhs);
 
 
-  insert();
-  insert();
-  insert();
-  erase();
-  erase();
-  erase();
 }
