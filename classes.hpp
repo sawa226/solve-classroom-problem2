@@ -103,24 +103,3 @@ public:
   Mtx add_row(int init);
 };
 
-class Mtx3d
-{
-private:
-  size_t n;
-  size_t m;
-  size_t k;
-  int *** mtx;
-public:
-  Mtx3d();
-  Mtx3d(size_t n, size_t m, size_t k, int field);
-  Mtx3d(const Mtx3d & rhs);
-  ~Mtx3d();
-  Mtx3d & operator=(const Mtx3d & rhs);
-  Mtx3d & operator=(Mtx3d && rhs) noexcept;
-  Mtx3d & operator[](const Mtx3d & rhs, size_t state = 10000000);
-  Mtx3d & operator[](const Mtx3d & rhs, int state);
-  Mtx3d & operator[](const Mtx3d & rhs, short state);
-  Mtx3d & operator+(const Mtx3d & rhs);
-
-
-}
