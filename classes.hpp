@@ -11,15 +11,16 @@ public:
   Ints();
   Ints(size_t size, int field);
   Ints(const Ints & rhs);
+  ~Ints();
   Ints & operator=(const Ints & rhs);
   Ints & operator=(const Ints && rhs) noexcept;
   Ints operator+(const Ints & rhs);
-  ~Ints();
 
-  size_t getSize() const noexcept {return size};
-  void set(size_t id, int i) noexcept {data[id] = i};
+  size_t getSize() const noexcept {return size;};
+  size_t getVolume() const noexcept {return volume;};
+  void set(size_t id, int i) noexcept {data[id] = i;};
   void setSave(size_t id, int i);
-  int get(size_t id) const noexcept {return data[id]};
+  int get(size_t id) const noexcept {return data[id];};
   int getSave(size_t id) const;
   Ints append(int i);
   Ints append(Ints b);
@@ -85,3 +86,31 @@ public:
   int det() const;
   Mtx add_row(int init);
 };
+
+class Mtx3d
+{
+private:
+  size_t n;
+  size_t m;
+  size_t k;
+  int *** mtx;
+public:
+  Mtx3d();
+  Mtx3d(size_t n, size_t m, size_t k, int field);
+  Mtx3d(const Mtx3d & rhs);
+  ~Mtx3d();
+  Mtx3d & operator=(const Mtx3d & rhs);
+  Mtx3d & operator=(Mtx3d && rhs) noexcept;
+  Mtx3d & operator[](const Mtx3d & rhs, size_t state = 10000000);
+  Mtx3d & operator[](const Mtx3d & rhs, int state);
+  Mtx3d & operator[](const Mtx3d & rhs, short state);
+  Mtx3d & operator+(const Mtx3d & rhs);
+
+
+  insert();
+  insert();
+  insert();
+  erase();
+  erase();
+  erase();
+}
