@@ -12,14 +12,20 @@ void Plot::set(int x, int y)
 
 int Plot::calc(int x) const
 {
+  if (data.getVolume() == 0) {
+    throw std::logic_error("Plot::calc: your massive too smal");
+  }
+  if (x < data.get(0).x || x > data.get(data.getVolume()-1).x) {
+    throw std::out_of_range("Plot::calc: out of range");
+  }
   size_t id_x1 = data.findSortY(x);
-  p_t p1 = data.get(id_x1);
   if (id_x1 == data.getVolume() || p1.x == x) {
     return p1.y;
   }
+  p_t p1 = data.get(id_x1);
   size_t id_x2 = id_x1 + 1;
   p_t p2 = data.get(id_x2);
-  return std::round((p2.y - p1.y) * 1.0 * (x - p1.x) / (p2.x - p1.x) + p1.y);
+  return (int)std::round((p2.y - p1.y) * 1.0 * (x - p1.x) / (p2.x - p1.x) + p1.y);
 }
 
 size_t Plot::solve(int y, Ints& buff) const
@@ -34,16 +40,18 @@ size_t Plot::solve(int y, Ints& buff) const
     }
     return 0;
   }
-  p_t pl = data.get(0);
-  p_t pr = data.get(1);
+  p_t pl = {0, 0};
+  p_t pr = {0, 0};
   size_t cnt = 0;
   for (size_t i = 1; i < data.getVolume(); i++) {
-    if (isDiffState(pl, pr, y) && pl.y != y) {
-      buff.append((pr.x - pl.x) * 1.0 * (y - p1.y) / (p2.y - p1.y) + p1.x);
+    pr = data.get(i);
+    pl = data.get(i-1);
+    if (isDiffState(pl, pr, y) && pl.y != y && pl.y != pr.y) {
+      buff.append((int)std::round((pr.x - pl.x) * 1.0 * (y - pl.y) / (pr.y - pl.y) + pl.x));
       cnt++;
     } else if (pr.y == y) {
       if (pr.y == pl.y) {
-        for (size_t j = pl.x+1; j <= pr.x; j++) {
+        for (int j = pl.x+1; j <= pr.x; j++) {
           buff.append(j);
           cnt++;
         }
@@ -59,7 +67,6 @@ size_t Plot::solve(int y, Ints& buff) const
 Points Plot::append(p_t point)
 {
   Points res(data);
-  res = res.appendSort();
-  std::swap(res, data);
-  return *this;
+  res = res.appendSort(point);
+  return res;
 }

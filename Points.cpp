@@ -18,29 +18,29 @@ void Points::set(size_t id, p_t point) noexcept
 
 void Points::setSave(size_t id, p_t point)
 {
-  if (id < 0 || id > data.volume) {
+  if (id >= datax.getVolume()) {
     throw std::out_of_range("Points::setSave: out of range");
   }
   datax.set(id, point.x);
   datay.set(id, point.y);
 }
 
-p_t Points::get(size_t id)
+p_t Points::get(size_t id) noexcept const
 {
-  return {datax.get(id), datay.get(id)}
+  return {datax.get(id), datay.get(id)};
 }
 
-p_t Points::getSave(size_t id)
+p_t Points::getSave(size_t id) const
 {
-  if (id < 0 || id > datax.volume) {
+  if (id >= datax.getVolume()) {
     throw std::out_of_range("Points::getSave: out of range");
   }
   return {datax.get(id), datay.get(id)};
 }
 
-size_t findSortX(int y)
+size_t Points::findSortY(int x) const
 {
-  return datay.findSort();
+  return datax.findSort(x);
 }
 
 Points Points::append(p_t point)
@@ -57,7 +57,7 @@ Points Points::appendSort(p_t point)
 {
   Points res(*this);
   res.datax.appendSort(point.x);
-  res.datay.insert(point.y, res.datax, k, [] (int a, int b) {return a == b});
+  res.datay.insert(point.y, res.datax, point.x, [] (int a, int b) {return a == b});
   std::swap(res.datax, datax);
   std::swap(res.datay, datay);
   return *this; 

@@ -8,9 +8,9 @@ Mtx::Mtx():
 
 Mtx::Mtx(size_t n, size_t m):
   n(n),
-  m(m),
+  m(m)
 {
-  if ( n > ULONG_MAX - m) {
+  if (m != 0 && n > ULONG_MAX / m) {
     throw std::logic_error("Mts::Mtx(size_t n, size_t m): Overflow");
   }
   data(n * m, 0);
@@ -29,8 +29,14 @@ Mtx Mtx::sum(const Mtx& b)
 
 Mtx Mtx::mul(int b)
 {
+  if (b == 0) {
+    Mtx res(n, m);
+    std::swap(res.data, data);
+    return *this;
+  }
   Mtx res(*this);
   int max_size_el = INT_MAX / b;
+  int min_size_el = INT_MIN / b;
   for (size_t i = 0; i < n * m; i++) {
     if (res.data.get(i) > max_size_el) {
       throw std::logic_error("Mtx::mul: Overflow");
@@ -81,26 +87,39 @@ Mtx Mtx::transpose() const
   return res;
 }
 
+int find_trivial_operation(int a, int b)
+{
+
+}
+
 int Mtx::det() const
 {
-  if (n ! = m) {
+  if (n != m) {
     throw std::logic_error("Mtx::det: diff sizes");
   }
   Mtx res(*this);
   int a = 0;
+  int b = 1;
   for (size_t i = 0; i < n; i++) {
     for (size_t j = 0; j < n; j++) {
       if (i != j) {
-        a = hi();
+        a = std::lcm(res.data.get(j * m + i), data.get(i * m + i));
+        b = 1;
+        if (a > res.data.get(j * m + i) {
+          b = a / res.data.get(j * m + i);
+        }
         for (size_t k = 0; k < m; k++) {
-          res.data.set(j * m + k, res.data.get(j * m + k) - a);
+          if (b > INT_MAX / res.data.get(j * m + k) || b < INT_MIN / res.data.get(j * m + k)) {
+            throw std::logic_error("Mtx::det: Overflow");
+          }
+          res.data.set(j * m + k, b * res.data.get(j * m + k) - a);
         }
       }
     }
   }
   int cnt = 1;
   for (size_t i = 0; i < n; i++) {
-    cnt * = res.data.get(i * m + i);
+    cnt *= res.data.get(i * m + i);
   }
   return cnt;
 }
@@ -109,5 +128,6 @@ Mtx Mtx::add_row(int init)
 {
   Ints row(m, init);
   data.append(row);
+  n++;
   return *this;
 }

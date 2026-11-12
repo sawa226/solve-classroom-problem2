@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 
 class Ints
 {
@@ -10,10 +11,11 @@ private:
 public:
   Ints();
   Ints(size_t size, int field);
+  Ints(size_t size);
   Ints(const Ints & rhs);
   ~Ints();
   Ints & operator=(const Ints & rhs);
-  Ints & operator=(const Ints && rhs) noexcept;
+  Ints & operator=(Ints && rhs) noexcept;
   Ints operator+(const Ints & rhs);
 
   size_t getSize() const noexcept {return size;};
@@ -24,13 +26,15 @@ public:
   int getSave(size_t id) const;
   size_t find(int i) const;
   size_t findSort(int i) const;
+  Ints insert(int i, bool (*func)(int, int) [] (int a, int b) {return a > b;});
+  Ints insert(int i, const Ints& mas, int k, bool (*func)(int, int) = [] (int a, int b) {return a > b;});
   Ints append(int i);
-  Ints appendSort(int i);
-  Ints append(Ints b);
-  Ints appendSort(int i);
+  Ints appendSort(int i, bool (*func)(int, int) = [] (int a, int b) {return a > b;});
+  Ints append(const Ints& b);
+  Ints appendSort(const Ints& i);
 };
 
-class p_t
+struct p_t
 {
   int x;
   int y;
@@ -53,11 +57,10 @@ public:
   void set(size_t id, p_t point) noexcept;
   void setSave(size_t id, p_t point);
   p_t get(size_t id) const noexcept;
-  p_t getSave(size_t id);
-  size_t findSortX(int y) const;
+  p_t getSave(size_t id) const;
   size_t findSortY(int x) const;
   Points append(p_t point);
-  Point appendSort(p_t point);
+  Points appendSort(p_t point);
 };
 
 class Plot
@@ -73,7 +76,7 @@ public:
 
   void set(int x, int y);
   int calc(int x) const;
-  void solve(int y, Ints& buff) const;
+  size_t solve(int y, Ints& buff) const;
   Points append(p_t point);
 };
 
