@@ -1,4 +1,7 @@
 #include "classes.hpp"
+#include <climits>
+#include <stdexcept>
+#include <utility>
 
 Mtx::Mtx():
   n(1),
@@ -13,7 +16,8 @@ Mtx::Mtx(size_t n, size_t m):
   if (m != 0 && n > ULONG_MAX / m) {
     throw std::logic_error("Mts::Mtx(size_t n, size_t m): Overflow");
   }
-  data(n * m, 0);
+  Ints res(n * m, 0);
+  data = std::move(res);
 }
 
 Mtx Mtx::sum(const Mtx& b)
@@ -23,8 +27,7 @@ Mtx Mtx::sum(const Mtx& b)
     throw std::logic_error("Mtx::sum: diff sizes");
   }
   res.data = res.data + b.data;
-  std::swap(res.data, data);
-  return *this;
+  return res;
 }
 
 Mtx Mtx::mul(int b)
@@ -35,16 +38,15 @@ Mtx Mtx::mul(int b)
     return *this;
   }
   Mtx res(*this);
-  int max_size_el = INT_MAX / b;
-  int min_size_el = INT_MIN / b;
+  long long temp = 0;
   for (size_t i = 0; i < n * m; i++) {
-    if (res.data.get(i) > max_size_el) {
+    temp = (long long)res.data.get(i) * b;
+    if (temp > INT_MAX || temp < INT_MIN) {
       throw std::logic_error("Mtx::mul: Overflow");
     }
-    res.data[i] *= b;
+    res.data.set(i, res.data.get(i)*b);
   }
-  std::swap(res.data, data);
-  return *this;
+  return res;
 }
 
 Mtx Mtx::mul(const Mtx& b)
@@ -70,10 +72,7 @@ Mtx Mtx::mul(const Mtx& b)
       res.data.set(s * b.m + k, (int)loc_sum);
     }
   }
-  std::swap(res.data, data);
-  std::swap(res.n, n);
-  std::swap(res.m, m);
-  return *this; 
+  return res; 
 }
 
 Mtx Mtx::transpose() const
@@ -87,41 +86,61 @@ Mtx Mtx::transpose() const
   return res;
 }
 
-int find_trivial_operation(int a, int b)
-{
-
-}
-
 int Mtx::det() const
 {
-  if (n != m) {
+  if (n != m)
     throw std::logic_error("Mtx::det: diff sizes");
-  }
+
+  if (n == 0) return 1;
+
   Mtx res(*this);
-  int a = 0;
-  int b = 1;
-  for (size_t i = 0; i < n; i++) {
-    for (size_t j = 0; j < n; j++) {
-      if (i != j) {
-        a = std::lcm(res.data.get(j * m + i), data.get(i * m + i));
-        b = 1;
-        if (a > res.data.get(j * m + i) {
-          b = a / res.data.get(j * m + i);
-        }
-        for (size_t k = 0; k < m; k++) {
-          if (b > INT_MAX / res.data.get(j * m + k) || b < INT_MIN / res.data.get(j * m + k)) {
-            throw std::logic_error("Mtx::det: Overflow");
-          }
-          res.data.set(j * m + k, b * res.data.get(j * m + k) - a);
-        }
-      }
+  long long prev = 1;
+  int sign = 1;
+
+  for (size_t k = 0; k < n - 1; k++) {
+    size_t p = k;
+
+    while (p < n && res.data.get(p * n + k) == 0) {
+      p++;
     }
+    if (p == n) {
+      return 0;
+    }
+    if (p != k) {
+      for (size_t j = 0; j < n; j++) {
+        int temp = res.data.get(k * n + j);
+        res.data.set(k * n + j, res.data.get(p * n + j));
+        res.data.set(p * n + j, temp);
+        }
+      sign = -sign;
+    }
+
+    long long pivot = res.data.get(k * n + k);
+
+    for (size_t i = k + 1; i < n; i++) {
+      for (size_t j = k + 1; j < n; j++) {
+        long long value =
+          (pivot * res.data.get(i * n + j) -
+           (long long)res.data.get(i * n + k) *
+           res.data.get(k * n + j)) / prev;
+
+        if (value > INT_MAX || value < INT_MIN)
+          throw std::logic_error("Mtx::det: Overflow");
+
+        res.data.set(i * n + j, (int)value);
+      }
+      res.data.set(i * n + k, 0);
+    }
+
+    prev = pivot;
   }
-  int cnt = 1;
-  for (size_t i = 0; i < n; i++) {
-    cnt *= res.data.get(i * m + i);
-  }
-  return cnt;
+
+  long long result = sign * (long long)res.data.get((n - 1) * n + n - 1);
+
+  if (result > INT_MAX || result < INT_MIN)
+    throw std::logic_error("Mtx::det: Overflow");
+
+  return (int)result;
 }
 
 Mtx Mtx::add_row(int init)

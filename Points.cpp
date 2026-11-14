@@ -1,4 +1,5 @@
 #include "classes.hpp"
+#include <stdexcept>
 
 Points::Points():
   datax(),
@@ -25,7 +26,7 @@ void Points::setSave(size_t id, p_t point)
   datay.set(id, point.y);
 }
 
-p_t Points::get(size_t id) noexcept const
+p_t Points::get(size_t id) const noexcept
 {
   return {datax.get(id), datay.get(id)};
 }
@@ -55,6 +56,6 @@ Points Points::appendSort(p_t point)
 {
   Points res(*this);
   res.datax.appendSort(point.x);
-  res.datay.insert(point.y, res.datax, point.x, [] (int a, int b) {return a == b});
+  res.datay.insert(point.y, res.datax, point.x, [] (int a, int b) {return a == b;});
   return res; 
 }

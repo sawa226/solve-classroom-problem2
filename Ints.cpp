@@ -69,7 +69,7 @@ Ints Ints::operator+(const Ints & rhs)
   Ints res(rhs);
   long long sum = 0;
   for (size_t i = 0; i < volume; i++) {
-  sum = (long long)(data[i]) + rhs.data[i];
+    sum = (long long)(data[i]) + rhs.data[i];
     if (sum > INT_MAX || sum < INT_MIN) {
       throw std::logic_error("Ints::+: Overflow");
     }
@@ -86,7 +86,7 @@ void Ints::setSave(size_t id, int i)
   data[id] = i;
 }
 
-int Ints::getSave(size_t id)
+int Ints::getSave(size_t id) const
 {
   if(id >= volume) {
     throw std::out_of_range("Ints::getSave: index out of range");
@@ -149,23 +149,23 @@ Ints Ints::insert(int i, bool (*func)(int, int))
   int temp = 0;
   int buff = 0;
   size_t j = 0;
-  for (; j < res.getVolume(); j++) {
+  for (; j < res.volume; j++) {
     if (func(res.data[j], i)) {
       temp = res.data[j];
       res.data[j] = i;
       break;
     }
   }
-  if (j == res.getVolume()) {
+  if (j == res.volume) {
     res.append(i);
   } else {
     j++;
-    if (res.getVolume() == res.getSize()) {
+    if (res.volume == res.size) {
       res.resize();
     }
     res.volume++;
   }
-  for (; j < res.getVolume(); j++) {
+  for (; j < res.volume; j++) {
     buff = res.data[j];
     res.data[j] = temp;
     temp = buff;
@@ -178,24 +178,27 @@ Ints Ints::insert(int i, bool (*func)(int, int))
 
 Ints Ints::insert(int i, const Ints& mas, int k, bool (*func)(int, int))
 {
+  if (volume != mas.volume) {
+    throw std::logic_error("");
+  }
   Ints res(*this);
   int temp = 0;
   int buff = 0;
   size_t j = 0;
-  for (; j < res.getVolume(); j++) {
+  for (; j < res.volume; j++) {
     if (func(mas.data[j], k)) {
       temp = res.data[j];
       res.data[j] = i;
       break;
     }
   }
-  if (j == res.getVolume()) {
+  if (j == res.volume) {
     res.append(i);
   } else {
     j++;
     res.volume++;
   }
-  for (; j < res.getVolume(); j++) {
+  for (; j < res.volume; j++) {
     buff = res.data[j];
     res.data[j] = temp;
     temp = buff;
@@ -221,7 +224,7 @@ Ints Ints::append(int i)
 Ints Ints::appendSort(int i, bool (*func)(int, int))
 {
   Ints res(*this);
-  if (volume == size) {
+  if (res.volume == res.size) {
     res.resize();
   }
   res = res.insert(i, func);
@@ -234,40 +237,33 @@ Ints Ints::appendSort(int i, bool (*func)(int, int))
 Ints Ints::append(const Ints& b)
 {
   Ints res(*this);
-  if (volume > ULONG_MAX - b.volume) {
+  if (res.volume > ULONG_MAX - b.volume) {
     throw std::logic_error("Ints::append: Overflow");
   }
-  if (volume + b.volume >= size) {
-    if (b.volume >= volume) {
-      res.resize(b.volume-volume);
-    } else {
-      res.resize(volume - b.volume);
-    }
+  if (res.volume + b.volume > res.size) {
+    res.resize(b.volume);
   }
   for (size_t i = 0; i < b.volume; i++) {
     res.data[res.volume + i] = b.data[i];
   }
+  res.volume += b.volume;
   std::swap(res.data, data);
-  std::swap(res.volume + b.volume, volume);
+  std::swap(res.volume, volume);
   std::swap(res.size, size);
   return *this;
 }
 
-Ints Ints::appendSort(const Ints& b)
+Ints Ints::appendSort(const Ints& b, bool (*func)(int, int))
 {
   Ints res(*this);
-  if (volume > ULONG_MAX - b.volume) {
+  if (res.volume > ULONG_MAX - b.volume) {
     throw std::logic_error("Ints::append: Overflow");
   }
-  if (volume + b.volume >= size) {
-    if (b.volume >= volume) {
-      res.resize(b.volume-volume);
-    } else {
-      res.resize(volume - b.volume);
-    }
+  if (res.volume + b.volume > res.size) {
+    res.resize(b.volume);
   }
   for (size_t i = 0; i < b.volume; i++) {
-    res.appendSort(b.data[i]);
+    res.insert(b.data[i], func);
   }
   std::swap(res.data, data);
   std::swap(res.volume, volume);

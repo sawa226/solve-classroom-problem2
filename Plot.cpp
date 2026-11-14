@@ -1,10 +1,12 @@
 #include "classes.hpp"
+#include <cmath>
+#include <stdexcept>
 
 Plot::Plot():
   data()
 {}
 
-Plot::Plot(size_t size, p_t point)
+Plot::Plot(size_t size, p_t point):
   data(size, point)
 {};
 
@@ -31,7 +33,7 @@ int Plot::calc(int x) const
   return (int)std::round((p2.y - p1.y) * 1.0 * (x - p1.x) / (p2.x - p1.x) + p1.y);
 }
 
-bool Plot::isDiffState(p_t pl, p_t pr, int y)
+bool Plot::isDiffState(p_t pl, p_t pr, int y) const
 {
   if (pl.y <= y && pr.y > y || pl.y > y && pr.y <= y) {
     return true;
