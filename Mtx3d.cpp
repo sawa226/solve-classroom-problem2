@@ -29,7 +29,7 @@ Mtx3d::Mtx3d():
   {
     mtx = new int* [m]{};
     mtx = new int [k]{};
-    mtx[i][j][l] = 0;
+    mtx[0][0][0] = 0;
   } catch (...) {
     clearMtx();
     throw;
