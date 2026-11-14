@@ -14,7 +14,7 @@ void clearMtx() noexcept
     }
     delete[] mtx[i];
   }
-  delete[] mtx;
+  delete mtx;
   mtx = nullptr;
 }
 
@@ -27,15 +27,9 @@ Mtx3d::Mtx3d():
   mtx = new int** [n]{};
   try
   {
-    for (size_t i = 0; i < n; i++) {
-      mtx[i] = new int* [m]{};
-      for (size_t j = 0; j < m; j++) {
-        mtx[i][j] = new int [k]{};
-        for (size_t l = 0; l < k; l++) {
-          mtx[i][j][l] = 0;
-        }
-      }
-    }
+    mtx = new int* [m]{};
+    mtx = new int [k]{};
+    mtx[i][j][l] = 0;
   } catch (...) {
     clearMtx();
     throw;
