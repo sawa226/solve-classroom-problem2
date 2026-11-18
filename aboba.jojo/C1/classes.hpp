@@ -1,3 +1,5 @@
+#ifndef ABoba_JOJO_C1_CLASSES_HPP
+#define ABoba_JOJO_C1_CLASSES_HPP
 #include <cstddef>
 
 class Ints {
@@ -179,3 +181,5 @@ public:
   Mtx3d insert(const Mtx3d& mass, size_t id);
   int conv(int (*func)(int a, int b));
 };
+
+#endif
