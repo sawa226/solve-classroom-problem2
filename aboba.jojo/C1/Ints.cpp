@@ -4,10 +4,9 @@
 #include <stdexcept>
 #include <utility>
 
-
 Ints::Ints():
-  volume(0),
   size(0),
+  volume(0),
   data(nullptr)
 {}
 
@@ -27,7 +26,7 @@ Ints::Ints(size_t size):
   data(new int[size])
 {}
 
-Ints::Ints(const Ints & rhs):
+Ints::Ints(const Ints& rhs):
   size(rhs.size),
   volume(rhs.volume),
   data(new int[rhs.size])
@@ -42,7 +41,7 @@ Ints::~Ints()
   delete[] data;
 }
 
-Ints & Ints::operator=(const Ints & rhs)
+Ints& Ints::operator=(const Ints& rhs)
 {
   Ints res(rhs);
   std::swap(res.volume, volume);
@@ -52,8 +51,7 @@ Ints & Ints::operator=(const Ints & rhs)
   return *this;
 }
 
-
-Ints & Ints::operator=(Ints && rhs) noexcept
+Ints& Ints::operator=(Ints&& rhs) noexcept
 {
   std::swap(rhs.volume, volume);
   std::swap(rhs.size, size);
@@ -61,7 +59,7 @@ Ints & Ints::operator=(Ints && rhs) noexcept
   return *this;
 }
 
-Ints Ints::operator+(const Ints & rhs)
+Ints Ints::operator+(const Ints& rhs)
 {
   if (rhs.volume != volume) {
     throw std::logic_error("Ints::+: diff sizes");
@@ -69,7 +67,7 @@ Ints Ints::operator+(const Ints & rhs)
   Ints res(rhs);
   long long sum = 0;
   for (size_t i = 0; i < volume; i++) {
-    sum = (long long)(data[i]) + rhs.data[i];
+    sum = static_cast< long long >(data[i]) + rhs.data[i];
     if (sum > INT_MAX || sum < INT_MIN) {
       throw std::logic_error("Ints::+: Overflow");
     }
@@ -80,7 +78,7 @@ Ints Ints::operator+(const Ints & rhs)
 
 void Ints::setSave(size_t id, int i)
 {
-  if(id >= volume) {
+  if (id >= volume) {
     throw std::out_of_range("Ints::setSave: index out of range");
   }
   data[id] = i;
@@ -88,7 +86,7 @@ void Ints::setSave(size_t id, int i)
 
 int Ints::getSave(size_t id) const
 {
-  if(id >= volume) {
+  if (id >= volume) {
     throw std::out_of_range("Ints::getSave: index out of range");
   }
   return data[id];
@@ -134,7 +132,7 @@ void Ints::resize(size_t len)
     }
     new_size = len + volume;
   }
-  int * res = new int[new_size];
+  int* res = new int[new_size];
   for (size_t i = 0; i < volume; i++) {
     res[i] = data[i];
   }
@@ -173,7 +171,7 @@ Ints Ints::insert(int i, bool (*func)(int, int))
   std::swap(res.data, data);
   std::swap(res.volume, volume);
   std::swap(res.size, size);
-  return *this; 
+  return *this;
 }
 
 Ints Ints::insert(int i, const Ints& mas, int k, bool (*func)(int, int))
@@ -206,7 +204,7 @@ Ints Ints::insert(int i, const Ints& mas, int k, bool (*func)(int, int))
   std::swap(res.data, data);
   std::swap(res.volume, volume);
   std::swap(res.size, size);
-  return *this; 
+  return *this;
 }
 Ints Ints::append(int i)
 {

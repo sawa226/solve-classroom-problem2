@@ -22,16 +22,19 @@ void Mtx3d::clearMtx() noexcept
 }
 
 Mtx3d::Mtx3d():
-  k(1),
-  m(1),
   n(1),
+  m(1),
+  k(1),
   mtx(nullptr)
 {
-  mtx = new int** [n]{};
-  try
+  mtx = new int** [n]
   {
-    mtx[0] = new int* [m]{};
-    mtx[0][0] = new int [k]{};
+  };
+  try {
+    mtx[0] = new int* [m]
+    {
+    };
+    mtx[0][0] = new int[k]{};
     mtx[0][0][0] = 0;
   } catch (...) {
     clearMtx();
@@ -40,18 +43,21 @@ Mtx3d::Mtx3d():
 }
 
 Mtx3d::Mtx3d(size_t n, size_t m, size_t k, int field):
-n(n),
+  n(n),
   m(m),
   k(k),
   mtx(nullptr)
 {
-  mtx = new int** [n]{};
-  try
+  mtx = new int** [n]
   {
+  };
+  try {
     for (size_t i = 0; i < n; i++) {
-      mtx[i] = new int* [m]{};
+      mtx[i] = new int* [m]
+      {
+      };
       for (size_t j = 0; j < m; j++) {
-        mtx[i][j] = new int [k]{};
+        mtx[i][j] = new int[k]{};
         for (size_t l = 0; l < k; l++) {
           mtx[i][j][l] = field;
         }
@@ -63,19 +69,22 @@ n(n),
   }
 }
 
-Mtx3d::Mtx3d(const Mtx3d & rhs):
+Mtx3d::Mtx3d(const Mtx3d& rhs):
   n(rhs.n),
   m(rhs.m),
   k(rhs.k),
   mtx(nullptr)
 {
-  mtx = new int** [n]{};
-  try
+  mtx = new int** [n]
   {
+  };
+  try {
     for (size_t i = 0; i < n; i++) {
-      mtx[i] = new int* [m]{};
+      mtx[i] = new int* [m]
+      {
+      };
       for (size_t j = 0; j < m; j++) {
-        mtx[i][j] = new int [k]{};
+        mtx[i][j] = new int[k]{};
         for (size_t l = 0; l < k; l++) {
           mtx[i][j][l] = rhs[i][j][l];
         }
@@ -92,7 +101,7 @@ Mtx3d::~Mtx3d()
   clearMtx();
 }
 
-Mtx3d & Mtx3d::operator=(const Mtx3d & rhs)
+Mtx3d& Mtx3d::operator=(const Mtx3d& rhs)
 {
   Mtx3d res(rhs);
   std::swap(n, res.n);
@@ -102,7 +111,7 @@ Mtx3d & Mtx3d::operator=(const Mtx3d & rhs)
   return *this;
 }
 
-Mtx3d & Mtx3d::operator=(Mtx3d && rhs) noexcept
+Mtx3d& Mtx3d::operator=(Mtx3d&& rhs) noexcept
 {
   if (this == &rhs) {
     return *this;
@@ -124,7 +133,7 @@ const int* const* Mtx3d::operator[](size_t i) const
   return mtx[i];
 }
 
-Mtx3d Mtx3d::operator+(const Mtx3d & rhs) const
+Mtx3d Mtx3d::operator+(const Mtx3d& rhs) const
 {
   Mtx3d res(*this);
   long long first = 0;
@@ -137,7 +146,7 @@ Mtx3d Mtx3d::operator+(const Mtx3d & rhs) const
         if (first > INT_MAX - second || first < INT_MIN + second) {
           throw std::logic_error("Mtx3d::+: Overflow");
         }
-        res[i][j][l] = (int)(first + second);
+        res[i][j][l] = static_cast< int >(first + second);
       }
     }
   }
@@ -147,7 +156,7 @@ Mtx3d Mtx3d::operator+(const Mtx3d & rhs) const
 Mtx3d Mtx3d::eraseX(size_t l, size_t r)
 {
   if (r == 0) {
-    r = l+1;
+    r = l + 1;
   }
   if (l >= r || r > m) {
     throw std::logic_error("");
@@ -163,7 +172,7 @@ Mtx3d Mtx3d::eraseX(size_t l, size_t r)
       if (j < r && j >= l) {
         continue;
       }
-      for(size_t s = 0; s < k; s++) {
+      for (size_t s = 0; s < k; s++) {
         res[i][jj][s] = mtx[i][j][s];
       }
       jj++;
@@ -175,7 +184,7 @@ Mtx3d Mtx3d::eraseX(size_t l, size_t r)
 Mtx3d Mtx3d::eraseY(size_t l, size_t r)
 {
   if (r == 0) {
-    r = l+1;
+    r = l + 1;
   }
   if (l >= r || r > n) {
     throw std::logic_error("");
@@ -199,11 +208,10 @@ Mtx3d Mtx3d::eraseY(size_t l, size_t r)
   return res;
 }
 
-
 Mtx3d Mtx3d::eraseZ(size_t l, size_t r)
 {
   if (r == 0) {
-    r = l+1;
+    r = l + 1;
   }
   if (l >= r || r > k) {
     throw std::logic_error("");
@@ -233,7 +241,7 @@ Mtx3d Mtx3d::erase(size_t r, size_t l)
   if (r > ULONG_MAX - l || (r + l) > m || (r + l) > m || (r + l) > k) {
     throw std::logic_error("");
   }
-  Mtx3d res = this->eraseX(m-r, m).eraseY(n-r, n).eraseZ(k-r, k);
+  Mtx3d res = this->eraseX(m - r, m).eraseY(n - r, n).eraseZ(k - r, k);
   if (l) {
     res = res.eraseX(0, l).eraseY(0, l).eraseZ(0, l);
   }
@@ -329,7 +337,6 @@ Mtx3d Mtx3d::insertZ(const Mtx3d& mass, size_t id)
   }
   return res;
 }
-
 
 Mtx3d Mtx3d::insert(const Mtx3d& mass, size_t id)
 {

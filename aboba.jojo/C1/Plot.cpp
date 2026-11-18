@@ -7,8 +7,7 @@ Plot::Plot():
 {}
 
 Plot::Plot(size_t size, p_t point):
-  data(size, point)
-{};
+  data(size, point) {};
 
 void Plot::set(int x, int y)
 {
@@ -21,7 +20,7 @@ int Plot::calc(int x) const
   if (data.getVolume() == 0) {
     throw std::logic_error("Plot::calc: your massive too smal");
   }
-  if (x < data.get(0).x || x > data.get(data.getVolume()-1).x) {
+  if (x < data.get(0).x || x > data.get(data.getVolume() - 1).x) {
     throw std::out_of_range("Plot::calc: out of range");
   }
   size_t id_x1 = data.findSortY(x);
@@ -30,12 +29,12 @@ int Plot::calc(int x) const
     return p1.y;
   }
   p_t p2 = data.get(id_x1 - 1);
-  return (int)std::round((p2.y - p1.y) * 1.0 * (x - p1.x) / (p2.x - p1.x) + p1.y);
+  return static_cast< int >(std::round((p2.y - p1.y) * 1.0 * (x - p1.x) / (p2.x - p1.x) + p1.y));
 }
 
 bool Plot::isDiffState(p_t pl, p_t pr, int y) const
 {
-  if (pl.y <= y && pr.y > y || pl.y > y && pr.y <= y) {
+  if ((pl.y <= y && pr.y > y) || (pl.y > y && pr.y <= y)) {
     return true;
   }
   return false;
@@ -58,13 +57,13 @@ size_t Plot::solve(int y, Ints& buff) const
   size_t cnt = 0;
   for (size_t i = 1; i < data.getVolume(); i++) {
     pr = data.get(i);
-    pl = data.get(i-1);
+    pl = data.get(i - 1);
     if (isDiffState(pl, pr, y) && pl.y != y && pl.y != pr.y) {
-      buff.append((int)std::round((pr.x - pl.x) * 1.0 * (y - pl.y) / (pr.y - pl.y) + pl.x));
+      buff.append(static_cast< int >(std::round((pr.x - pl.x) * 1.0 * (y - pl.y) / (pr.y - pl.y) + pl.x)));
       cnt++;
     } else if (pr.y == y) {
       if (pr.y == pl.y) {
-        for (int j = pl.x+1; j <= pr.x; j++) {
+        for (int j = pl.x + 1; j <= pr.x; j++) {
           buff.append(j);
           cnt++;
         }

@@ -56,6 +56,10 @@ Points Points::appendSort(p_t point)
 {
   Points res(*this);
   res.datax.appendSort(point.x);
-  res.datay.insert(point.y, res.datax, point.x, [] (int a, int b) {return a == b;});
-  return res; 
+  res.datay.insert(point.y, res.datax, point.x,
+      [](int a, int b)
+      {
+        return a == b;
+      });
+  return res;
 }

@@ -40,11 +40,11 @@ Mtx Mtx::mul(int b)
   Mtx res(*this);
   long long temp = 0;
   for (size_t i = 0; i < n * m; i++) {
-    temp = (long long)res.data.get(i) * b;
+    temp = static_cast< long long >(res.data.get(i) * b);
     if (temp > INT_MAX || temp < INT_MIN) {
       throw std::logic_error("Mtx::mul: Overflow");
     }
-    res.data.set(i, res.data.get(i)*b);
+    res.data.set(i, res.data.get(i) * b);
   }
   return res;
 }
@@ -69,10 +69,10 @@ Mtx Mtx::mul(const Mtx& b)
           throw std::logic_error("Mtx::mul: Overflow");
         }
       }
-      res.data.set(s * b.m + k, (int)loc_sum);
+      res.data.set(s * b.m + k, static_cast< int >(loc_sum));
     }
   }
-  return res; 
+  return res;
 }
 
 Mtx Mtx::transpose() const
@@ -88,10 +88,13 @@ Mtx Mtx::transpose() const
 
 int Mtx::det() const
 {
-  if (n != m)
+  if (n != m) {
     throw std::logic_error("Mtx::det: diff sizes");
+  }
 
-  if (n == 0) return 1;
+  if (n == 0) {
+    return 1;
+  }
 
   Mtx res(*this);
   long long prev = 1;
@@ -111,7 +114,7 @@ int Mtx::det() const
         int temp = res.data.get(k * n + j);
         res.data.set(k * n + j, res.data.get(p * n + j));
         res.data.set(p * n + j, temp);
-        }
+      }
       sign = -sign;
     }
 
@@ -119,15 +122,14 @@ int Mtx::det() const
 
     for (size_t i = k + 1; i < n; i++) {
       for (size_t j = k + 1; j < n; j++) {
-        long long value =
-          (pivot * res.data.get(i * n + j) -
-           (long long)res.data.get(i * n + k) *
-           res.data.get(k * n + j)) / prev;
-
-        if (value > INT_MAX || value < INT_MIN)
+        long long value = (pivot * res.data.get(i * n + j)
+                              - static_cast< long long >(res.data.get(i * n + k)) * res.data.get(k * n + j))
+            / prev;
+        if (value > INT_MAX || value < INT_MIN) {
           throw std::logic_error("Mtx::det: Overflow");
+        }
 
-        res.data.set(i * n + j, (int)value);
+        res.data.set(i * n + j, static_cast< int >(value));
       }
       res.data.set(i * n + k, 0);
     }
@@ -135,12 +137,13 @@ int Mtx::det() const
     prev = pivot;
   }
 
-  long long result = sign * (long long)res.data.get((n - 1) * n + n - 1);
+  long long result = sign * static_cast< long long >(res.data.get((n - 1) * n + n - 1));
 
-  if (result > INT_MAX || result < INT_MIN)
+  if (result > INT_MAX || result < INT_MIN) {
     throw std::logic_error("Mtx::det: Overflow");
+  }
 
-  return (int)result;
+  return static_cast< int >(result);
 }
 
 Mtx Mtx::add_row(int init)
